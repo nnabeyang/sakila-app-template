@@ -1,0 +1,23 @@
+FROM mysql:8.0.29-oracle
+
+RUN microdnf install -y tar
+RUN curl -SL https://downloads.mysql.com/docs/sakila-db.tar.gz | tar zxvf -
+RUN cat ./sakila-db/sakila-data.sql |\
+sed 's/INSERT INTO `address`/INSERT INTO `address`(`address_id`, `address`, `address2`, `district`, `city_id`, `postal_code`, `phone`, `location`, `last_update`)/g' |\
+sed 's/INSERT INTO city/INSERT INTO city(`city_id`,`city`, `country_id`, `last_update`)/g' |\
+sed 's/INSERT INTO country/INSERT INTO country(`country_id`, `country`, `last_update`)/g' |\
+sed 's/INSERT INTO customer/INSERT INTO customer(`customer_id`, `store_id`, `first_name`, `last_name`, `email`, `address_id`, `active`, `create_date`, `last_update`)/g' |\
+sed 's/INSERT INTO film_actor/INSERT INTO film_actor(`actor_id`, `film_id`, `last_update`)/g' |\
+sed 's/INSERT INTO film_category/INSERT INTO film_category(`film_id`, `category_id`, `last_update`)/g' |\
+sed 's/INSERT INTO inventory/INSERT INTO inventory(`inventory_id`, `film_id`, `store_id`, `last_update`)/g' |\
+sed 's/INSERT INTO language/INSERT INTO language(`language_id`, `name`, `last_update`)/g' |\
+sed 's/INSERT INTO payment/INSERT INTO payment(`payment_id`, `customer_id`, `staff_id`, `rental_id`, `amount`, `payment_date`, `last_update`)/g' |\
+sed 's/INSERT INTO rental/INSERT INTO rental(`rental_id`, `rental_date`, `inventory_id`, `customer_id`, `return_date`, `staff_id`, `last_update`)/g' |\
+sed 's/INSERT INTO `staff`/INSERT INTO `staff`(`staff_id`, `first_name`, `last_name`, `address_id`, `picture`, `email`, `store_id`, `active`, `username`, `password`, `last_update`)/g' |\
+sed 's/INSERT INTO store/INSERT INTO store(`store_id`, `manager_staff_id`, `address_id`, `last_update`)/g' |\
+sed 's/INSERT INTO film /INSERT INTO film(`film_id`, `title`, `description`, `release_year`, `language_id`, `original_language_id`, `rental_duration`, `rental_rate`, `length`, `replacement_cost`, `rating`, `special_features`, `last_update`) /g' |\
+sed 's/INSERT INTO actor /INSERT INTO actor(`actor_id`, `first_name`, `last_name`, `last_update`) /g' |\
+sed 's/INSERT INTO category /INSERT INTO category(`category_id`, `name`, `last_update`) /g' > ./sakila-db/data.sql
+COPY ./local-db/*.sql ./sakila-db
+RUN cat ./sakila-db/schema.sql ./sakila-db/data.sql > /docker-entrypoint-initdb.d/init.sql
+RUN rm -rf ./sakila-db

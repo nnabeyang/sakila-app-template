@@ -1,0 +1,16 @@
+{
+	"name": "Docker from Docker Compose",
+	"dockerComposeFile": "../docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/app",
+	"settings": {
+		"[go]": {
+			"editor.formatOnSave": true
+		}
+	},
+	"extensions": [
+		"golang.go",
+		"mtxr.sqltools"
+	],
+	"remoteUser": "root"
+}
